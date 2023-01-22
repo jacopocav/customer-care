@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: customer-care
+  datasource:
+    url: jdbc:h2:mem:customercare
