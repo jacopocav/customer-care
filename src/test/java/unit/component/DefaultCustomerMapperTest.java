@@ -17,6 +17,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.NullSource;
 
 import io.jacopocav.customercare.component.DefaultCustomerMapper;
+import io.jacopocav.customercare.dto.CustomerCreationRequest;
 import io.jacopocav.customercare.dto.CustomerQueryResponse;
 import io.jacopocav.customercare.dto.CustomerUpdateRequest;
 import io.jacopocav.customercare.model.Customer;
@@ -42,6 +43,16 @@ class DefaultCustomerMapperTest {
         void toEntity_throws_givenIllegalArguments(CustomerUpdateRequest request, Customer entity) {
             // when
             final var error = catchThrowable(() -> underTest.toEntity(request, entity));
+
+            // then
+            then(error).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @ParameterizedTest
+        @NullSource
+        void toNewEntity_throws_givenIllegalArgument(CustomerCreationRequest request) {
+            // when
+            final var error = catchThrowable(() -> underTest.toNewEntity(request));
 
             // then
             then(error).isInstanceOf(IllegalArgumentException.class);
@@ -100,6 +111,30 @@ class DefaultCustomerMapperTest {
 
             // then
             then(entity)
+                .usingRecursiveComparison()
+                .isEqualTo(expected);
+        }
+
+        @Test
+        void toNewEntity_returnsNewCustomerWithValuesCopiedFromRequest() {
+            // given
+            final var dto = new CustomerCreationRequest(
+                "John",
+                "Doe",
+                "XXX",
+                "Something Something Boulevard 33");
+
+            final var expected = new Customer()
+                .setFirstName("John")
+                .setLastName("Doe")
+                .setFiscalCode("XXX")
+                .setAddress("Something Something Boulevard 33");
+
+            // when
+            final Customer actual = underTest.toNewEntity(dto);
+
+            // then
+            then(actual)
                 .usingRecursiveComparison()
                 .isEqualTo(expected);
         }
