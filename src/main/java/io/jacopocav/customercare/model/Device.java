@@ -10,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +29,7 @@ public class Device extends CommonModel {
     private String color;
 
     @ManyToOne(fetch = LAZY)
+    @JoinColumn(nullable = false)
     private Customer customer;
 
     public enum Status {
