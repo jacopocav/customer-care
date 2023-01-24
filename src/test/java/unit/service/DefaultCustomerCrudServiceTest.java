@@ -24,9 +24,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import io.jacopocav.customercare.component.CustomerMapper;
-import io.jacopocav.customercare.dto.CustomerCreationRequest;
-import io.jacopocav.customercare.dto.CustomerQueryResponse;
-import io.jacopocav.customercare.dto.CustomerUpdateRequest;
+import io.jacopocav.customercare.dto.CreateCustomerRequest;
+import io.jacopocav.customercare.dto.ReadCustomerResponse;
+import io.jacopocav.customercare.dto.UpdateCustomerRequest;
 import io.jacopocav.customercare.error.ResourceNotFoundException;
 import io.jacopocav.customercare.model.Customer;
 import io.jacopocav.customercare.repository.CustomerRepository;
@@ -69,7 +69,7 @@ class DefaultCustomerCrudServiceTest {
 
         @ParameterizedTest
         @ArgumentsSource(Update_IllegalArguments.class)
-        void update_throws_givenIllegalArguments(String id, CustomerUpdateRequest request) {
+        void update_throws_givenIllegalArguments(String id, UpdateCustomerRequest request) {
             // when
             final var error = catchThrowable(() -> underTest.update(id, request));
 
@@ -85,7 +85,7 @@ class DefaultCustomerCrudServiceTest {
             // given
             final var expected = UUID.randomUUID();
             final var newCustomer = new Customer();
-            final var request = new CustomerCreationRequest("", "", "", "");
+            final var request = new CreateCustomerRequest("", "", "", "");
 
             given(mapper.toNewEntity(request))
                 .willReturn(newCustomer);
@@ -124,7 +124,7 @@ class DefaultCustomerCrudServiceTest {
             final var id = UUID.randomUUID();
             final var customer = new Customer()
                 .setId(id);
-            final var expected = new CustomerQueryResponse(id.toString(), "", "", "", "");
+            final var expected = new ReadCustomerResponse(id.toString(), "", "", "", "");
 
             given(repository.findById(id))
                 .willReturn(Optional.of(customer));
@@ -133,7 +133,7 @@ class DefaultCustomerCrudServiceTest {
                 .willReturn(expected);
 
             // when
-            final CustomerQueryResponse actual = underTest.read(id.toString());
+            final ReadCustomerResponse actual = underTest.read(id.toString());
 
             // then
             and.then(actual).isEqualTo(expected);
@@ -143,7 +143,7 @@ class DefaultCustomerCrudServiceTest {
         void update_throws_givenCustomerNotFound() {
             // given
             final var id = UUID.randomUUID();
-            final var request = new CustomerUpdateRequest("some address");
+            final var request = new UpdateCustomerRequest("some address");
 
             // when
             final var error = catchThrowable(() -> underTest.update(id.toString(), request));
@@ -160,7 +160,7 @@ class DefaultCustomerCrudServiceTest {
         void update_mapsRequestToCustomer_givenCustomerFound() {
             // given
             final var id = UUID.randomUUID();
-            final var request = new CustomerUpdateRequest("some address");
+            final var request = new UpdateCustomerRequest("some address");
 
             final var customer = new Customer().setId(id);
 
@@ -189,7 +189,7 @@ class DefaultCustomerCrudServiceTest {
     }
 
     static class Update_IllegalArguments implements ArgumentsProvider {
-        static final CustomerUpdateRequest validUpdate = new CustomerUpdateRequest("something");
+        static final UpdateCustomerRequest validUpdate = new UpdateCustomerRequest("something");
 
         @Override
         public Stream<Arguments> provideArguments(ExtensionContext context) {

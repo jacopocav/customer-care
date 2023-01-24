@@ -18,9 +18,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockServletContext;
 
-import io.jacopocav.customercare.dto.CustomerCreationRequest;
-import io.jacopocav.customercare.dto.CustomerQueryResponse;
-import io.jacopocav.customercare.dto.CustomerUpdateRequest;
+import io.jacopocav.customercare.dto.CreateCustomerRequest;
+import io.jacopocav.customercare.dto.ReadCustomerResponse;
+import io.jacopocav.customercare.dto.UpdateCustomerRequest;
 import io.jacopocav.customercare.rest.CustomerController;
 import io.jacopocav.customercare.service.CustomerCrudService;
 
@@ -38,7 +38,7 @@ class CustomerControllerTest {
     @Test
     void create() {
         // given
-        final var body = new CustomerCreationRequest("John", "Doe", "ABCX", "Some Road 101");
+        final var body = new CreateCustomerRequest("John", "Doe", "ABCX", "Some Road 101");
         final var servletRequest = post(URI.create("https://www.some-base-url.com:1234/customers"))
             .buildRequest(new MockServletContext());
         final var newId = UUID.randomUUID();
@@ -64,13 +64,13 @@ class CustomerControllerTest {
         // given
         final var id = "12345";
         final var expected =
-            new CustomerQueryResponse(id, "Mary", "Doe", "4321X", "Any Road 66");
+            new ReadCustomerResponse(id, "Mary", "Doe", "4321X", "Any Road 66");
 
         given(crudService.read(id))
             .willReturn(expected);
 
         // when
-        final CustomerQueryResponse actual = underTest.read(id);
+        final ReadCustomerResponse actual = underTest.read(id);
 
         // then
         and.then(actual).isEqualTo(expected);
@@ -81,7 +81,7 @@ class CustomerControllerTest {
         // given
         final var id = "12345";
         final var request =
-            new CustomerUpdateRequest("New Road 72");
+            new UpdateCustomerRequest("New Road 72");
 
         // when
         underTest.update(id, request);

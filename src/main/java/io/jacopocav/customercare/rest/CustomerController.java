@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import io.jacopocav.customercare.dto.CustomerCreationRequest;
-import io.jacopocav.customercare.dto.CustomerQueryResponse;
-import io.jacopocav.customercare.dto.CustomerUpdateRequest;
+import io.jacopocav.customercare.dto.CreateCustomerRequest;
+import io.jacopocav.customercare.dto.ReadCustomerResponse;
+import io.jacopocav.customercare.dto.UpdateCustomerRequest;
 import io.jacopocav.customercare.service.CustomerCrudService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<Void> create(
-        @RequestBody CustomerCreationRequest body,
+        @RequestBody CreateCustomerRequest body,
         HttpServletRequest request
     ) {
         final var newId = crudService.create(body).toString();
@@ -48,12 +48,12 @@ public class CustomerController {
     }
 
     @GetMapping(path = "/{id}", consumes = ALL_VALUE)
-    public CustomerQueryResponse read(@PathVariable @UUID String id) {
+    public ReadCustomerResponse read(@PathVariable @UUID String id) {
         return crudService.read(id);
     }
 
     @PatchMapping("/{id}")
-    public void update(@PathVariable @UUID String id, @RequestBody CustomerUpdateRequest body) {
+    public void update(@PathVariable @UUID String id, @RequestBody UpdateCustomerRequest body) {
         crudService.update(id, body);
     }
 }

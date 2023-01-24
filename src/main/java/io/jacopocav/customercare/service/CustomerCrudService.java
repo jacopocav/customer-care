@@ -2,14 +2,14 @@ package io.jacopocav.customercare.service;
 
 import java.util.UUID;
 
-import io.jacopocav.customercare.dto.CustomerCreationRequest;
-import io.jacopocav.customercare.dto.CustomerQueryResponse;
-import io.jacopocav.customercare.dto.CustomerUpdateRequest;
+import io.jacopocav.customercare.dto.CreateCustomerRequest;
+import io.jacopocav.customercare.dto.ReadCustomerResponse;
+import io.jacopocav.customercare.dto.UpdateCustomerRequest;
 
 public interface CustomerCrudService {
-    UUID create(CustomerCreationRequest request);
+    UUID create(CreateCustomerRequest request);
 
-    CustomerQueryResponse read(String id);
+    ReadCustomerResponse read(String id);
 
-    void update(String id, CustomerUpdateRequest request);
+    void update(String id, UpdateCustomerRequest request);
 }

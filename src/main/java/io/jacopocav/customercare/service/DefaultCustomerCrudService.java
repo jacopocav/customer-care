@@ -9,9 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import io.jacopocav.customercare.component.CustomerMapper;
-import io.jacopocav.customercare.dto.CustomerCreationRequest;
-import io.jacopocav.customercare.dto.CustomerQueryResponse;
-import io.jacopocav.customercare.dto.CustomerUpdateRequest;
+import io.jacopocav.customercare.dto.CreateCustomerRequest;
+import io.jacopocav.customercare.dto.ReadCustomerResponse;
+import io.jacopocav.customercare.dto.UpdateCustomerRequest;
 import io.jacopocav.customercare.error.ResourceNotFoundException;
 import io.jacopocav.customercare.model.Customer;
 import io.jacopocav.customercare.repository.CustomerRepository;
@@ -25,7 +25,7 @@ public class DefaultCustomerCrudService implements CustomerCrudService {
     private final CustomerRepository repository;
 
     @Override
-    public UUID create(CustomerCreationRequest request) {
+    public UUID create(CreateCustomerRequest request) {
         Assert.notNull(request, "request is null");
 
         final Customer customer = mapper.toNewEntity(request);
@@ -34,7 +34,7 @@ public class DefaultCustomerCrudService implements CustomerCrudService {
 
     @Override
     @Transactional(readOnly = true)
-    public CustomerQueryResponse read(String id) {
+    public ReadCustomerResponse read(String id) {
         Assert.isTrue(isNotBlank(id), "id is blank or null");
 
         final var customer = findCustomer(id);
@@ -42,7 +42,7 @@ public class DefaultCustomerCrudService implements CustomerCrudService {
     }
 
     @Override
-    public void update(String id, CustomerUpdateRequest request) {
+    public void update(String id, UpdateCustomerRequest request) {
         Assert.isTrue(isNotBlank(id), "id is blank or null");
         Assert.notNull(request, "request is null");
 

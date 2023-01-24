@@ -1,6 +1,6 @@
 package io.jacopocav.customercare.dto;
 
-public record CustomerQueryResponse(
+public record ReadCustomerResponse(
     String id,
     String firstName,
     String lastName,

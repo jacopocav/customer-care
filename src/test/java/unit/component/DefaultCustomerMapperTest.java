@@ -17,9 +17,9 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.NullSource;
 
 import io.jacopocav.customercare.component.DefaultCustomerMapper;
-import io.jacopocav.customercare.dto.CustomerCreationRequest;
-import io.jacopocav.customercare.dto.CustomerQueryResponse;
-import io.jacopocav.customercare.dto.CustomerUpdateRequest;
+import io.jacopocav.customercare.dto.CreateCustomerRequest;
+import io.jacopocav.customercare.dto.ReadCustomerResponse;
+import io.jacopocav.customercare.dto.UpdateCustomerRequest;
 import io.jacopocav.customercare.model.Customer;
 
 class DefaultCustomerMapperTest {
@@ -40,7 +40,7 @@ class DefaultCustomerMapperTest {
 
         @ParameterizedTest
         @ArgumentsSource(ToEntity_IllegalArguments.class)
-        void toEntity_throws_givenIllegalArguments(CustomerUpdateRequest request, Customer entity) {
+        void toEntity_throws_givenIllegalArguments(UpdateCustomerRequest request, Customer entity) {
             // when
             final var error = catchThrowable(() -> underTest.toEntity(request, entity));
 
@@ -50,7 +50,7 @@ class DefaultCustomerMapperTest {
 
         @ParameterizedTest
         @NullSource
-        void toNewEntity_throws_givenIllegalArgument(CustomerCreationRequest request) {
+        void toNewEntity_throws_givenIllegalArgument(CreateCustomerRequest request) {
             // when
             final var error = catchThrowable(() -> underTest.toNewEntity(request));
 
@@ -73,7 +73,7 @@ class DefaultCustomerMapperTest {
                 .setFiscalCode("XXX")
                 .setAddress("Country Road 66");
 
-            final var expected = new CustomerQueryResponse(
+            final var expected = new ReadCustomerResponse(
                 customerId.toString(),
                 "John",
                 "Doe",
@@ -82,7 +82,7 @@ class DefaultCustomerMapperTest {
             );
 
             // when
-            final CustomerQueryResponse actual = underTest.toDto(entity);
+            final ReadCustomerResponse actual = underTest.toDto(entity);
 
             // then
             then(actual).isEqualTo(expected);
@@ -98,7 +98,7 @@ class DefaultCustomerMapperTest {
                 .setAddress("Old Address Road 36");
 
             final var newAddress = "New Address Avenue 42";
-            final var dto = new CustomerUpdateRequest(newAddress);
+            final var dto = new UpdateCustomerRequest(newAddress);
 
             final var expected = new Customer()
                 .setFirstName("John")
@@ -118,7 +118,7 @@ class DefaultCustomerMapperTest {
         @Test
         void toNewEntity_returnsNewCustomerWithValuesCopiedFromRequest() {
             // given
-            final var dto = new CustomerCreationRequest(
+            final var dto = new CreateCustomerRequest(
                 "John",
                 "Doe",
                 "XXX",
@@ -146,7 +146,7 @@ class DefaultCustomerMapperTest {
             return Stream.of(
                 arguments(null, null),
                 arguments(null, new Customer()),
-                arguments(new CustomerUpdateRequest(""), null)
+                arguments(new UpdateCustomerRequest(""), null)
             );
         }
     }

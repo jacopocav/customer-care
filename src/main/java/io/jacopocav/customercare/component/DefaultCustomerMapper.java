@@ -3,18 +3,18 @@ package io.jacopocav.customercare.component;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import io.jacopocav.customercare.dto.CustomerCreationRequest;
-import io.jacopocav.customercare.dto.CustomerQueryResponse;
-import io.jacopocav.customercare.dto.CustomerUpdateRequest;
+import io.jacopocav.customercare.dto.CreateCustomerRequest;
+import io.jacopocav.customercare.dto.ReadCustomerResponse;
+import io.jacopocav.customercare.dto.UpdateCustomerRequest;
 import io.jacopocav.customercare.model.Customer;
 
 @Component
 public class DefaultCustomerMapper implements CustomerMapper {
     @Override
-    public CustomerQueryResponse toDto(Customer entity) {
+    public ReadCustomerResponse toDto(Customer entity) {
         Assert.notNull(entity, "entity is null");
 
-        return new CustomerQueryResponse(
+        return new ReadCustomerResponse(
             entity.getId().toString(),
             entity.getFirstName(),
             entity.getLastName(),
@@ -24,7 +24,7 @@ public class DefaultCustomerMapper implements CustomerMapper {
     }
 
     @Override
-    public void toEntity(CustomerUpdateRequest source, Customer target) {
+    public void toEntity(UpdateCustomerRequest source, Customer target) {
         Assert.notNull(source, "source is null");
         Assert.notNull(target, "target is null");
 
@@ -32,7 +32,7 @@ public class DefaultCustomerMapper implements CustomerMapper {
     }
 
     @Override
-    public Customer toNewEntity(CustomerCreationRequest request) {
+    public Customer toNewEntity(CreateCustomerRequest request) {
         Assert.notNull(request, "request is null");
 
         return new Customer()
