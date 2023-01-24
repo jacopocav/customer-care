@@ -11,5 +11,5 @@ public interface CustomerCrudService {
 
     CustomerQueryResponse read(String id);
 
-    void update(CustomerUpdateRequest request);
+    void update(String id, CustomerUpdateRequest request);
 }
