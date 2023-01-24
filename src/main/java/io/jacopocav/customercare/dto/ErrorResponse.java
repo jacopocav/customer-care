@@ -15,7 +15,7 @@ public record ErrorResponse<T>(
         return new ErrorResponse<>(summary, details, additionalInfo);
     }
 
-    public <S> ErrorResponse<S> withMoreInfo(S metadata) {
+    public <S> ErrorResponse<S> withAdditionalInfo(S metadata) {
         return new ErrorResponse<>(summary, description, metadata);
     }
 }

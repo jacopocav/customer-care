@@ -52,7 +52,7 @@ public class ValidationExceptionHandler {
             .collect(groupingBy(this::getPropertyPath,
                 mapping(ConstraintViolation::getMessage, joining(", "))));
 
-        return RESPONSE.withMoreInfo(errorMap);
+        return RESPONSE.withAdditionalInfo(errorMap);
     }
 
     private String getPropertyPath(ConstraintViolation<?> cv) {
@@ -75,7 +75,7 @@ public class ValidationExceptionHandler {
             format("required request parameter of type %s is not present", ex.getParameterType())
         );
 
-        return RESPONSE.withMoreInfo(moreInfo);
+        return RESPONSE.withAdditionalInfo(moreInfo);
     }
 
     @ExceptionHandler
@@ -109,7 +109,7 @@ public class ValidationExceptionHandler {
             moreInfo = fieldErrors;
         }
 
-        return RESPONSE.withMoreInfo(moreInfo);
+        return RESPONSE.withAdditionalInfo(moreInfo);
     }
 
     @ExceptionHandler
@@ -123,6 +123,6 @@ public class ValidationExceptionHandler {
 
         return RESPONSE
             .withDescription("Parameter cannot be parsed to the correct type")
-            .withMoreInfo(moreInfo);
+            .withAdditionalInfo(moreInfo);
     }
 }
