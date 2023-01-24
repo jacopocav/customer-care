@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Validated
@@ -46,7 +47,7 @@ public class CustomerController {
         })
     @PostMapping
     public ResponseEntity<Void> create(
-        @RequestBody CreateCustomerRequest body,
+        @RequestBody @Valid CreateCustomerRequest body,
         HttpServletRequest request
     ) {
         final var newId = crudService.create(body).toString();
@@ -78,7 +79,10 @@ public class CustomerController {
             @ApiResponse(responseCode = "404", description = "Customer not found"),
         })
     @PatchMapping("/{id}")
-    public void update(@PathVariable @UUID String id, @RequestBody UpdateCustomerRequest body) {
+    public void update(
+        @PathVariable @UUID String id,
+        @RequestBody @Valid UpdateCustomerRequest body
+    ) {
         crudService.update(id, body);
     }
 
