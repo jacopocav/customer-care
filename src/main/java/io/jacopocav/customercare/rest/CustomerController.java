@@ -18,11 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.jacopocav.customercare.dto.CreateCustomerRequest;
+import io.jacopocav.customercare.dto.ErrorResponse;
 import io.jacopocav.customercare.dto.ReadCustomerResponse;
 import io.jacopocav.customercare.dto.UpdateCustomerRequest;
 import io.jacopocav.customercare.service.CustomerCrudService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -43,7 +46,8 @@ public class CustomerController {
         responses = {
             @ApiResponse(responseCode = "201", description = "Customer created successfully",
                 headers = @Header(name = "Location", description = "URI of the new customer")),
-            @ApiResponse(responseCode = "400", description = "Bad request")
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
         })
     @PostMapping
     public ResponseEntity<Void> create(
@@ -63,8 +67,10 @@ public class CustomerController {
         summary = "Retrieves a customer",
         responses = {
             @ApiResponse(responseCode = "200", description = "Success"),
-            @ApiResponse(responseCode = "400", description = "Bad request"),
-            @ApiResponse(responseCode = "404", description = "Customer not found"),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Customer not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         })
     @GetMapping(path = "/{id}", consumes = ALL_VALUE)
     public ReadCustomerResponse read(@PathVariable @UUID String id) {
@@ -75,8 +81,10 @@ public class CustomerController {
         summary = "Updates a customer",
         responses = {
             @ApiResponse(responseCode = "200", description = "Customer updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad request"),
-            @ApiResponse(responseCode = "404", description = "Customer not found"),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Customer not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         })
     @PatchMapping("/{id}")
     public void update(
@@ -90,8 +98,10 @@ public class CustomerController {
         summary = "Deletes a customer",
         responses = {
             @ApiResponse(responseCode = "200", description = "Customer deleted successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad request"),
-            @ApiResponse(responseCode = "404", description = "Customer not found"),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Customer not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         })
     @DeleteMapping(value = "/{id}", consumes = ALL_VALUE)
     public void delete(@PathVariable @UUID String id) {
