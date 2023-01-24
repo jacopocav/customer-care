@@ -7,6 +7,7 @@ import static org.springframework.http.ResponseEntity.created;
 import org.hibernate.validator.constraints.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,5 +56,10 @@ public class CustomerController {
     @PatchMapping("/{id}")
     public void update(@PathVariable @UUID String id, @RequestBody UpdateCustomerRequest body) {
         crudService.update(id, body);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable @UUID String id) {
+        crudService.delete(id);
     }
 }

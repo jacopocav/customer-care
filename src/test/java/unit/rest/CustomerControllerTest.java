@@ -89,4 +89,16 @@ class CustomerControllerTest {
         // then
         then(crudService).should().update(id, request);
     }
+
+    @Test
+    void delete() {
+        // given
+        final var id = "12345";
+
+        // when
+        underTest.delete(id);
+
+        // then
+        then(crudService).should().delete(id);
+    }
 }
