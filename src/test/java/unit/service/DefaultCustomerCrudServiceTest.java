@@ -28,7 +28,7 @@ import io.jacopocav.customercare.component.CustomerMapper;
 import io.jacopocav.customercare.dto.CreateCustomerRequest;
 import io.jacopocav.customercare.dto.ReadCustomerResponse;
 import io.jacopocav.customercare.dto.UpdateCustomerRequest;
-import io.jacopocav.customercare.error.ResourceNotFoundException;
+import io.jacopocav.customercare.error.CustomerNotFoundException;
 import io.jacopocav.customercare.model.Customer;
 import io.jacopocav.customercare.repository.CustomerRepository;
 import io.jacopocav.customercare.service.DefaultCustomerCrudService;
@@ -124,8 +124,8 @@ class DefaultCustomerCrudServiceTest {
             // then
             then(mapper).shouldHaveNoInteractions();
             and.then(error)
-                .asInstanceOf(type(ResourceNotFoundException.class))
-                .extracting(ResourceNotFoundException::getIdentifier)
+                .asInstanceOf(type(CustomerNotFoundException.class))
+                .extracting(CustomerNotFoundException::getIdentifier)
                 .isEqualTo(id);
         }
 
@@ -162,8 +162,8 @@ class DefaultCustomerCrudServiceTest {
             // then
             then(mapper).shouldHaveNoInteractions();
             and.then(error)
-                .asInstanceOf(type(ResourceNotFoundException.class))
-                .extracting(ResourceNotFoundException::getIdentifier)
+                .asInstanceOf(type(CustomerNotFoundException.class))
+                .extracting(CustomerNotFoundException::getIdentifier)
                 .isEqualTo(id);
         }
 
@@ -199,8 +199,8 @@ class DefaultCustomerCrudServiceTest {
             // then
             then(mapper).shouldHaveNoInteractions();
             and.then(error)
-                .asInstanceOf(type(ResourceNotFoundException.class))
-                .extracting(ResourceNotFoundException::getIdentifier)
+                .asInstanceOf(type(CustomerNotFoundException.class))
+                .extracting(CustomerNotFoundException::getIdentifier)
                 .isEqualTo(id);
         }
 

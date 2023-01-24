@@ -12,7 +12,7 @@ import io.jacopocav.customercare.component.CustomerMapper;
 import io.jacopocav.customercare.dto.CreateCustomerRequest;
 import io.jacopocav.customercare.dto.ReadCustomerResponse;
 import io.jacopocav.customercare.dto.UpdateCustomerRequest;
-import io.jacopocav.customercare.error.ResourceNotFoundException;
+import io.jacopocav.customercare.error.CustomerNotFoundException;
 import io.jacopocav.customercare.model.Customer;
 import io.jacopocav.customercare.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +61,7 @@ public class DefaultCustomerCrudService implements CustomerCrudService {
     private Customer findCustomer(String id) {
         final var uuid = UUID.fromString(id);
         return repository.findById(uuid)
-            .orElseThrow(() -> new ResourceNotFoundException(uuid));
+            .orElseThrow(() -> new CustomerNotFoundException(uuid));
     }
 
     private static void requireNotBlank(String value, String name) {
