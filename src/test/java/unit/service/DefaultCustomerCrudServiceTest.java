@@ -2,6 +2,7 @@ package unit.service;
 
 import static org.assertj.core.api.BDDAssertions.and;
 import static org.assertj.core.api.BDDAssertions.catchThrowable;
+import static org.assertj.core.api.BDDAssertions.thenNoException;
 import static org.assertj.core.api.InstanceOfAssertFactories.type;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.BDDMockito.given;
@@ -58,7 +59,7 @@ class DefaultCustomerCrudServiceTest {
         }
 
         @ParameterizedTest
-        @ArgumentsSource(Read_IllegalArguments.class)
+        @ArgumentsSource(IllegalIds.class)
         void read_throws_givenIllegalId(String illegalId) {
             // when
             final var error = catchThrowable(() -> underTest.read(illegalId));
@@ -72,6 +73,16 @@ class DefaultCustomerCrudServiceTest {
         void update_throws_givenIllegalArguments(String id, UpdateCustomerRequest request) {
             // when
             final var error = catchThrowable(() -> underTest.update(id, request));
+
+            // then
+            and.then(error).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @ParameterizedTest
+        @ArgumentsSource(IllegalIds.class)
+        void delete_throws_givenIllegalArguments(String id) {
+            // when
+            final var error = catchThrowable(() -> underTest.delete(id));
 
             // then
             and.then(error).isInstanceOf(IllegalArgumentException.class);
@@ -173,9 +184,41 @@ class DefaultCustomerCrudServiceTest {
             // then
             then(mapper).should().toEntity(request, customer);
         }
+
+        @Test
+        void delete_throws_givenCustomerNotFound() {
+            // given
+            final var id = UUID.randomUUID();
+
+            given(repository.findById(id))
+                .willReturn(Optional.empty());
+
+            // when
+            final var error = catchThrowable(() -> underTest.delete(id.toString()));
+
+            // then
+            then(mapper).shouldHaveNoInteractions();
+            and.then(error)
+                .asInstanceOf(type(ResourceNotFoundException.class))
+                .extracting(ResourceNotFoundException::getIdentifier)
+                .isEqualTo(id);
+        }
+
+        @Test
+        void delete_returnsWithoutThrowing_givenCustomerFound() {
+            // given
+            final var id = UUID.randomUUID();
+            final var customer = new Customer().setId(id);
+
+            given(repository.findById(id))
+                .willReturn(Optional.of(customer));
+
+            // when/then
+            thenNoException().isThrownBy(() -> underTest.delete(id.toString()));
+        }
     }
 
-    static class Read_IllegalArguments implements ArgumentsProvider {
+    static class IllegalIds implements ArgumentsProvider {
         @Override
         public Stream<Arguments> provideArguments(ExtensionContext context) {
             return Stream.<String>builder()

@@ -35,7 +35,7 @@ public class DefaultCustomerCrudService implements CustomerCrudService {
     @Override
     @Transactional(readOnly = true)
     public ReadCustomerResponse read(String id) {
-        Assert.isTrue(isNotBlank(id), "id is blank or null");
+        requireNotBlank(id, "id");
 
         final var customer = findCustomer(id);
         return mapper.toDto(customer);
@@ -43,16 +43,28 @@ public class DefaultCustomerCrudService implements CustomerCrudService {
 
     @Override
     public void update(String id, UpdateCustomerRequest request) {
-        Assert.isTrue(isNotBlank(id), "id is blank or null");
+        requireNotBlank(id, "id");
         Assert.notNull(request, "request is null");
 
         final var customer = findCustomer(id);
         mapper.toEntity(request, customer);
     }
 
+    @Override
+    public void delete(String id) {
+        requireNotBlank(id, "id");
+
+        final var customer = findCustomer(id);
+        repository.delete(customer);
+    }
+
     private Customer findCustomer(String id) {
         final var uuid = UUID.fromString(id);
         return repository.findById(uuid)
             .orElseThrow(() -> new ResourceNotFoundException(uuid));
+    }
+
+    private static void requireNotBlank(String value, String name) {
+        Assert.isTrue(isNotBlank(value), name + " is blank or null");
     }
 }
