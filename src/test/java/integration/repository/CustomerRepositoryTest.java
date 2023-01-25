@@ -51,6 +51,7 @@ class CustomerRepositoryTest {
         then(actual)
             .get()
             .usingRecursiveComparison()
+            .ignoringFields("createdAt", "lastModifiedAt")
             .isEqualTo(expected);
     }
 
@@ -92,7 +93,7 @@ class CustomerRepositoryTest {
 
         then(actualCustomer)
             .usingRecursiveComparison()
-            .ignoringFields("devices")
+            .ignoringFields("devices", "createdAt", "lastModifiedAt")
             .isEqualTo(expected);
 
         then(actualCustomer.getDevices())
@@ -102,7 +103,7 @@ class CustomerRepositoryTest {
 
         then(actualDevice)
             .usingRecursiveComparison()
-            .ignoringFields("customer")
+            .ignoringFields("customer", "createdAt", "lastModifiedAt")
             .isEqualTo(device);
 
         then(actualCustomer)
