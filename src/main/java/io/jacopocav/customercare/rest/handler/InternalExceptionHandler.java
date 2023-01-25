@@ -2,11 +2,13 @@ package io.jacopocav.customercare.rest.handler;
 
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackFrames;
+import static org.springframework.core.Ordered.LOWEST_PRECEDENCE;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -16,6 +18,7 @@ import io.jacopocav.customercare.dto.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Order(LOWEST_PRECEDENCE)
 @RestControllerAdvice
 public class InternalExceptionHandler {
 

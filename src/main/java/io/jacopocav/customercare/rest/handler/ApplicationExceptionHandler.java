@@ -2,6 +2,7 @@ package io.jacopocav.customercare.rest.handler;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -11,6 +12,7 @@ import io.jacopocav.customercare.error.CustomerNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Order(0)
 @RestControllerAdvice
 public class ApplicationExceptionHandler {
     @ExceptionHandler
