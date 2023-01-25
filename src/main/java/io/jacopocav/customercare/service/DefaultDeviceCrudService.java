@@ -77,6 +77,12 @@ public class DefaultDeviceCrudService implements DeviceCrudService {
         repository.delete(device);
     }
 
+    @Override
+    public boolean exists(String id) {
+        requireNotBlank(id, "id");
+        return repository.existsById(UUID.fromString(id));
+    }
+
     private Device findDevice(String id) {
         final var uuid = UUID.fromString(id);
         return repository.findById(uuid)

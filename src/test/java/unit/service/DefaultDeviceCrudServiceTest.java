@@ -24,6 +24,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -88,6 +89,16 @@ class DefaultDeviceCrudServiceTest {
         void delete_throws_givenIllegalArguments(String id) {
             // when
             final var error = catchThrowable(() -> underTest.delete(id));
+
+            // then
+            and.then(error).isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @ParameterizedTest
+        @ArgumentsSource(IllegalIds.class)
+        void exists_throws_givenIllegalArguments(String id) {
+            // when
+            final var error = catchThrowable(() -> underTest.exists(id));
 
             // then
             and.then(error).isInstanceOf(IllegalArgumentException.class);
@@ -246,6 +257,22 @@ class DefaultDeviceCrudServiceTest {
 
             // when/then
             thenNoException().isThrownBy(() -> underTest.delete(id.toString()));
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void exists(boolean expected) {
+            // given
+            final var id = UUID.randomUUID();
+
+            given(repository.existsById(id))
+                .willReturn(expected);
+
+            // when
+            final var actual = underTest.exists(id.toString());
+
+            // then
+            and.then(actual).isEqualTo(expected);
         }
     }
 

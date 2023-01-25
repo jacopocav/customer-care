@@ -15,4 +15,6 @@ public interface DeviceCrudService {
     void update(@NotBlank String id, UpdateDeviceRequest request);
 
     void delete(@NotBlank String id);
+
+    boolean exists(@NotBlank String id);
 }
