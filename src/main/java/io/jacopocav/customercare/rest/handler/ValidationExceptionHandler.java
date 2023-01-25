@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -33,6 +34,7 @@ import jakarta.validation.Path.Node;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Order(1)
 @RestControllerAdvice
 public class ValidationExceptionHandler {
     private static final Set<ElementKind> ROOT_KINDS = Set.of(BEAN, METHOD, CONSTRUCTOR);
