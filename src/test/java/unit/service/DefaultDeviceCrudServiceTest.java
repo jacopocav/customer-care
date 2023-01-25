@@ -5,13 +5,16 @@ import static org.assertj.core.api.BDDAssertions.catchThrowable;
 import static org.assertj.core.api.BDDAssertions.thenNoException;
 import static org.assertj.core.api.InstanceOfAssertFactories.type;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
 
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,6 +31,7 @@ import io.jacopocav.customercare.component.DeviceMapper;
 import io.jacopocav.customercare.dto.CreateDeviceRequest;
 import io.jacopocav.customercare.dto.ReadDeviceResponse;
 import io.jacopocav.customercare.dto.UpdateDeviceRequest;
+import io.jacopocav.customercare.error.DeviceLimitReachedException;
 import io.jacopocav.customercare.error.DeviceNotFoundException;
 import io.jacopocav.customercare.model.Device;
 import io.jacopocav.customercare.repository.DeviceRepository;
@@ -36,6 +40,7 @@ import io.jacopocav.customercare.service.DefaultDeviceCrudService;
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("AccessStaticViaInstance")
 class DefaultDeviceCrudServiceTest {
+    static final int DEVICE_LIMIT = 42;
     @Mock DeviceMapper mapper;
     @Mock DeviceRepository repository;
 
@@ -43,7 +48,7 @@ class DefaultDeviceCrudServiceTest {
 
     @BeforeEach
     void setUp() {
-        underTest = new DefaultDeviceCrudService(mapper, repository);
+        underTest = new DefaultDeviceCrudService(mapper, repository, DEVICE_LIMIT);
     }
 
     @Nested
@@ -92,12 +97,38 @@ class DefaultDeviceCrudServiceTest {
     @Nested
     class LegalArgumentsTest {
         @Test
-        void create_returnsUuidOfCreatedDevice() {
+        void create_throws_givenLimitReachedForGivenCustomer() {
             // given
+            final var customerId = UUID.randomUUID();
+            final var request = new CreateDeviceRequest(customerId.toString(), "", "");
+
+            given(repository.countByCustomerId(customerId))
+                .willReturn(DEVICE_LIMIT);
+
+            // when
+            final var error = catchThrowable(() -> underTest.create(request));
+
+            // then
+            then(mapper).shouldHaveNoInteractions();
+            then(repository).should(never()).save(any());
+
+            and.then(error)
+                .asInstanceOf(type(DeviceLimitReachedException.class))
+                .extracting(DeviceLimitReachedException::getLimit,
+                    DeviceLimitReachedException::getCustomerId)
+                .containsExactly(DEVICE_LIMIT, customerId);
+        }
+
+        @Test
+        void create_returnsUuidOfCreatedDevice_givenLimitNotReachedForGivenCustomer() {
+            // given
+            final var customerId = UUID.randomUUID();
             final var expected = UUID.randomUUID();
             final var newDevice = new Device();
-            final var request = new CreateDeviceRequest("", "", "");
+            final var request = new CreateDeviceRequest(customerId.toString(), "", "");
 
+            given(repository.countByCustomerId(customerId))
+                .willReturn(RandomUtils.nextInt(0, DEVICE_LIMIT));
             given(mapper.toNewEntity(request))
                 .willReturn(newDevice);
             given(repository.save(newDevice))
