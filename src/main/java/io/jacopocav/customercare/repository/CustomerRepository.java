@@ -11,7 +11,7 @@ import io.jacopocav.customercare.model.Customer;
 public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     @Query("select c "
         + "from Customer c "
-        + "join fetch c.devices "
+        + "left join fetch c.devices "
         + "where c.id = :id")
     Optional<Customer> findByIdFetchingDevices(UUID id);
 }
