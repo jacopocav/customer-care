@@ -1,7 +1,5 @@
 package io.jacopocav.customercare.component;
 
-import java.util.List;
-
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -9,12 +7,20 @@ import io.jacopocav.customercare.dto.CreateCustomerRequest;
 import io.jacopocav.customercare.dto.ReadCustomerResponse;
 import io.jacopocav.customercare.dto.UpdateCustomerRequest;
 import io.jacopocav.customercare.model.Customer;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class DefaultCustomerMapper implements CustomerMapper {
+    private final DeviceMapper deviceMapper;
+
     @Override
     public ReadCustomerResponse toDto(Customer entity) {
         Assert.notNull(entity, "entity is null");
+
+        final var devices = entity.getDevices().stream()
+            .map(deviceMapper::toDto)
+            .toList();
 
         return new ReadCustomerResponse(
             entity.getId().toString(),
@@ -22,7 +28,7 @@ public class DefaultCustomerMapper implements CustomerMapper {
             entity.getLastName(),
             entity.getFiscalCode(),
             entity.getAddress(),
-            List.of()
+            devices
         );
     }
 
