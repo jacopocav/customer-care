@@ -3,3 +3,6 @@ spring:
     name: customer-care
   datasource:
     url: jdbc:h2:mem:customercare
+
+customer-care:
+  max-devices-per-customer: 2
