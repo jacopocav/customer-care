@@ -4,6 +4,7 @@ import static org.assertj.core.api.BDDAssertions.catchThrowable;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -78,7 +79,8 @@ class DefaultCustomerMapperTest {
                 "John",
                 "Doe",
                 "XXX",
-                "Country Road 66"
+                "Country Road 66",
+                List.of()
             );
 
             // when

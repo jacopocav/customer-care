@@ -7,6 +7,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -64,7 +65,7 @@ class CustomerControllerTest {
         // given
         final var id = "12345";
         final var expected =
-            new ReadCustomerResponse(id, "Mary", "Doe", "4321X", "Any Road 66");
+            new ReadCustomerResponse(id, "Mary", "Doe", "4321X", "Any Road 66", List.of());
 
         given(crudService.read(id))
             .willReturn(expected);

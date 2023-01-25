@@ -1,5 +1,7 @@
 package io.jacopocav.customercare.component;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -19,7 +21,8 @@ public class DefaultCustomerMapper implements CustomerMapper {
             entity.getFirstName(),
             entity.getLastName(),
             entity.getFiscalCode(),
-            entity.getAddress()
+            entity.getAddress(),
+            List.of()
         );
     }
 
