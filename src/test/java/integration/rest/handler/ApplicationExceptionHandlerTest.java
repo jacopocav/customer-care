@@ -26,6 +26,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import integration.rest.handler.ValidationExceptionHandlerTest.Config.TestController;
 import io.jacopocav.customercare.dto.ErrorResponse;
 import io.jacopocav.customercare.error.CustomerNotFoundException;
+import io.jacopocav.customercare.error.DeviceLimitReachedException;
+import io.jacopocav.customercare.error.DeviceNotFoundException;
 import io.jacopocav.customercare.rest.handler.ApplicationExceptionHandler;
 import lombok.RequiredArgsConstructor;
 
@@ -57,6 +59,51 @@ class ApplicationExceptionHandlerTest {
             .andExpect(content().json(mapper.writeValueAsString(expected)));
     }
 
+    @Test
+    void handle_deviceNotFoundException() throws Exception {
+        // given
+        final var id = UUID.randomUUID();
+        final var expected = new ErrorResponse<>(
+            "Device not found",
+            "Could not find device with id " + id,
+            null
+        );
+
+        // when
+        final var result = mockMvc.perform(get("/test/device")
+            .queryParam("id", id.toString()));
+
+        // then
+        result
+            .andExpect(status().isNotFound())
+            .andExpect(content().contentType(APPLICATION_JSON))
+            .andExpect(content().json(mapper.writeValueAsString(expected)));
+    }
+
+    @Test
+    void handle_deviceLimitReachedException() throws Exception {
+        // given
+        final var customerId = UUID.randomUUID();
+        final var limit = 42;
+        final var expected = new ErrorResponse<>(
+            "Device limit reached",
+            "customer %s already has the maximum allowed number of devices (%d)"
+                .formatted(customerId, limit),
+            null
+        );
+
+        // when
+        final var result = mockMvc.perform(get("/test/device/limit")
+            .queryParam("id", customerId.toString())
+            .queryParam("limit", Integer.toString(limit)));
+
+        // then
+        result
+            .andExpect(status().isNotFound())
+            .andExpect(content().contentType(APPLICATION_JSON))
+            .andExpect(content().json(mapper.writeValueAsString(expected)));
+    }
+
     @Configuration
     static class Config {
         @Bean
@@ -73,6 +120,16 @@ class ApplicationExceptionHandlerTest {
             @GetMapping("/customer")
             String customerNotFound(@RequestParam String id) {
                 throw new CustomerNotFoundException(UUID.fromString(id));
+            }
+
+            @GetMapping("/device")
+            String deviceNotFound(@RequestParam String id) {
+                throw new DeviceNotFoundException(UUID.fromString(id));
+            }
+
+            @GetMapping("/device/limit")
+            String deviceLimitReached(@RequestParam String id, @RequestParam int limit) {
+                throw new DeviceLimitReachedException(limit, UUID.fromString(id));
             }
         }
     }
