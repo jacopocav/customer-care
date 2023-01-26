@@ -3,27 +3,43 @@ package unit.component;
 import static org.assertj.core.api.BDDAssertions.catchThrowable;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.mockito.BDDMockito.given;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.NullSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import io.jacopocav.customercare.component.DefaultCustomerMapper;
+import io.jacopocav.customercare.component.DeviceMapper;
 import io.jacopocav.customercare.dto.CreateCustomerRequest;
 import io.jacopocav.customercare.dto.ReadCustomerResponse;
+import io.jacopocav.customercare.dto.ReadDeviceResponse;
 import io.jacopocav.customercare.dto.UpdateCustomerRequest;
 import io.jacopocav.customercare.model.Customer;
+import io.jacopocav.customercare.model.Device;
 
+@ExtendWith(MockitoExtension.class)
 class DefaultCustomerMapperTest {
-    DefaultCustomerMapper underTest = new DefaultCustomerMapper();
+    @Mock DeviceMapper deviceMapper;
+    DefaultCustomerMapper underTest;
+
+    @BeforeEach
+    void setUp() {
+        underTest = new DefaultCustomerMapper(deviceMapper);
+    }
 
     @Nested
     class IllegalArgumentsTest {
@@ -66,20 +82,36 @@ class DefaultCustomerMapperTest {
         void toDto_returnsDtoEquivalentToGivenCustomer() {
             // given
             final var customerId = UUID.randomUUID();
+
+            final var device1 = new Device().setColor("red");
+            final var expectedDevice1 =
+                new ReadDeviceResponse("", "", "red", customerId.toString());
+
+            final var device2 = new Device().setColor("blue");
+            final var expectedDevice2 =
+                new ReadDeviceResponse("", "", "blue", customerId.toString());
+
             final var entity = new Customer()
                 .setId(customerId)
                 .setFirstName("John")
                 .setLastName("Doe")
                 .setFiscalCode("XXX")
-                .setAddress("Country Road 66");
+                .setAddress("Country Road 66")
+                .setDevices(List.of(device1, device2));
 
             final var expected = new ReadCustomerResponse(
                 customerId.toString(),
                 "John",
                 "Doe",
                 "XXX",
-                "Country Road 66"
+                "Country Road 66",
+                List.of(expectedDevice1, expectedDevice2)
             );
+
+            given(deviceMapper.toDto(device1))
+                .willReturn(expectedDevice1);
+            given(deviceMapper.toDto(device2))
+                .willReturn(expectedDevice2);
 
             // when
             final ReadCustomerResponse actual = underTest.toDto(entity);

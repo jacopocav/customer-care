@@ -8,6 +8,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -115,7 +116,7 @@ class DefaultCustomerCrudServiceTest {
             // given
             final var id = UUID.randomUUID();
 
-            given(repository.findById(id))
+            given(repository.findByIdFetchingDevices(id))
                 .willReturn(Optional.empty());
 
             // when
@@ -135,9 +136,9 @@ class DefaultCustomerCrudServiceTest {
             final var id = UUID.randomUUID();
             final var customer = new Customer()
                 .setId(id);
-            final var expected = new ReadCustomerResponse(id.toString(), "", "", "", "");
+            final var expected = new ReadCustomerResponse(id.toString(), "", "", "", "", List.of());
 
-            given(repository.findById(id))
+            given(repository.findByIdFetchingDevices(id))
                 .willReturn(Optional.of(customer));
 
             given(mapper.toDto(customer))

@@ -28,6 +28,6 @@ public class Customer extends CommonModel {
     private String fiscalCode;
     @Column(nullable = false)
     private String address;
-    @OneToMany(fetch = LAZY)
+    @OneToMany(fetch = LAZY, mappedBy = "customer")
     private List<Device> devices;
 }
