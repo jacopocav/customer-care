@@ -23,4 +23,19 @@ public abstract class CommonModel {
     private LocalDateTime createdAt;
     @Version
     private long version;
+
+    @Override
+    public final boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    @Override
+    public final int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public final String toString() {
+        return super.toString();
+    }
 }
