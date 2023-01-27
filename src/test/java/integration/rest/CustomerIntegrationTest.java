@@ -1,6 +1,6 @@
 package integration.rest;
 
-import static integration.rest.SampleCustomer.sample;
+import static integration.rest.SampleCustomer.sampleCustomer;
 import static org.apache.commons.lang3.StringUtils.stripStart;
 import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 import static org.assertj.core.api.BDDAssertions.then;
@@ -53,7 +53,7 @@ class CustomerIntegrationTest {
         final var readResult = readCustomer(id).getBody();
 
         then(readResult)
-            .isEqualTo(sample.withId(id.toString()).toReadResponse());
+            .isEqualTo(sampleCustomer.withId(id.toString()).toReadResponse());
     }
 
     @Test
@@ -73,7 +73,7 @@ class CustomerIntegrationTest {
         then(readResponse.getStatusCode())
             .isEqualTo(OK);
         then(readResponse.getBody())
-            .isEqualTo(sample.withId(id.toString()).toReadResponse());
+            .isEqualTo(sampleCustomer.withId(id.toString()).toReadResponse());
     }
 
     @Test
@@ -82,7 +82,7 @@ class CustomerIntegrationTest {
         final var oldAddress = "Old Road 6";
         final var newAddress = "New Road 4";
         final UUID id = prepareSampleCustomer(oldAddress);
-        final var expected = sample
+        final var expected = sampleCustomer
             .withId(id.toString())
             .withAddress(newAddress)
             .toReadResponse();
@@ -125,7 +125,7 @@ class CustomerIntegrationTest {
     }
 
     private UUID prepareSampleCustomer() {
-        return prepareSampleCustomer(sample.address());
+        return prepareSampleCustomer(sampleCustomer.address());
     }
 
     private UUID prepareSampleCustomer(String address) {
@@ -149,11 +149,11 @@ class CustomerIntegrationTest {
     }
 
     private ResponseEntity<String> createSampleCustomer() {
-        return createSampleCustomer(sample.address());
+        return createSampleCustomer(sampleCustomer.address());
     }
 
     private ResponseEntity<String> createSampleCustomer(String address) {
-        final var customer = sample.withAddress(address).toCreateRequest();
+        final var customer = sampleCustomer.withAddress(address).toCreateRequest();
         return rest.postForEntity(urlOf("/customers"), customer, String.class);
     }
 
