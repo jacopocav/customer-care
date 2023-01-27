@@ -1,5 +1,6 @@
 package io.jacopocav.customercare.rest.handler;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import org.springframework.core.annotation.Order;
@@ -38,7 +39,7 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(NOT_FOUND)
+    @ResponseStatus(BAD_REQUEST)
     public ErrorResponse<Void> handle(DeviceLimitReachedException ex) {
         log.debug("Device limit reached", ex);
 
