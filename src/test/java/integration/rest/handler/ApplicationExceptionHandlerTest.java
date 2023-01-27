@@ -99,7 +99,7 @@ class ApplicationExceptionHandlerTest {
 
         // then
         result
-            .andExpect(status().isNotFound())
+            .andExpect(status().isBadRequest())
             .andExpect(content().contentType(APPLICATION_JSON))
             .andExpect(content().json(mapper.writeValueAsString(expected)));
     }
