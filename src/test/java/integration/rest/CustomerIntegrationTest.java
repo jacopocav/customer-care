@@ -1,12 +1,9 @@
 package integration.rest;
 
 import static integration.rest.SampleCustomer.sampleCustomer;
-import static org.apache.commons.lang3.StringUtils.stripStart;
 import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
@@ -19,22 +16,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
+import integration.RestIntegrationTest;
 import io.jacopocav.customercare.CustomerCareApplication;
 import io.jacopocav.customercare.dto.ReadCustomerResponse;
 import io.jacopocav.customercare.dto.UpdateCustomerRequest;
+import lombok.Getter;
 
 @ActiveProfiles("test")
 @SpringBootTest(classes = CustomerCareApplication.class, webEnvironment = RANDOM_PORT)
-class CustomerIntegrationTest {
+class CustomerIntegrationTest implements RestIntegrationTest {
 
+    @Getter
     @LocalServerPort
     private int port;
 
-    @Autowired TestRestTemplate rest;
+    @Getter
+    @Autowired
+    TestRestTemplate rest;
 
     @Test
     void create() {
@@ -135,13 +136,12 @@ class CustomerIntegrationTest {
     }
 
     private ResponseEntity<String> deleteCustomer(UUID id) {
-        return rest.exchange(urlOf("/customers/" + id), DELETE, null, String.class);
+        return deleteForEntity(urlOf("/customers/" + id), String.class);
     }
 
     private ResponseEntity<String> updateCustomer(UUID id, String newAddress) {
         final var updateRequest = new UpdateCustomerRequest(newAddress);
-        return rest.exchange(urlOf("/customers/" + id), PATCH,
-            new HttpEntity<>(updateRequest), String.class);
+        return patchForEntity(urlOf("/customers/" + id), updateRequest, String.class);
     }
 
     private ResponseEntity<ReadCustomerResponse> readCustomer(UUID id) {
@@ -155,10 +155,5 @@ class CustomerIntegrationTest {
     private ResponseEntity<String> createSampleCustomer(String address) {
         final var customer = sampleCustomer.withAddress(address).toCreateRequest();
         return rest.postForEntity(urlOf("/customers"), customer, String.class);
-    }
-
-    private URI urlOf(String resource) {
-        final var string = "http://localhost:%d/%s".formatted(port, stripStart(resource, "/"));
-        return URI.create(string);
     }
 }
