@@ -1,5 +1,6 @@
 package integration.rest;
 
+import static integration.rest.SampleCustomer.sample;
 import static org.apache.commons.lang3.StringUtils.stripStart;
 import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 import static org.assertj.core.api.BDDAssertions.then;
@@ -11,7 +12,6 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -24,19 +24,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
 import io.jacopocav.customercare.CustomerCareApplication;
-import io.jacopocav.customercare.dto.CreateCustomerRequest;
 import io.jacopocav.customercare.dto.ReadCustomerResponse;
 import io.jacopocav.customercare.dto.UpdateCustomerRequest;
 
 @ActiveProfiles("test")
 @SpringBootTest(classes = CustomerCareApplication.class, webEnvironment = RANDOM_PORT)
 class CustomerIntegrationTest {
-    static class Sample {
-        static final String firstName = "Alice";
-        static final String lastName = "Bobsworth";
-        static final String fiscalCode = "ALCBBS58T92C234P";
-        static final String address = "Default Road 0";
-    }
 
     @LocalServerPort
     private int port;
@@ -60,7 +53,7 @@ class CustomerIntegrationTest {
         final var readResult = readCustomer(id).getBody();
 
         then(readResult)
-            .isEqualTo(sampleReadCustomerResponse(id));
+            .isEqualTo(sample.withId(id.toString()).toReadResponse());
     }
 
     @Test
@@ -80,7 +73,7 @@ class CustomerIntegrationTest {
         then(readResponse.getStatusCode())
             .isEqualTo(OK);
         then(readResponse.getBody())
-            .isEqualTo(sampleReadCustomerResponse(id));
+            .isEqualTo(sample.withId(id.toString()).toReadResponse());
     }
 
     @Test
@@ -89,6 +82,10 @@ class CustomerIntegrationTest {
         final var oldAddress = "Old Road 6";
         final var newAddress = "New Road 4";
         final UUID id = prepareSampleCustomer(oldAddress);
+        final var expected = sample
+            .withId(id.toString())
+            .withAddress(newAddress)
+            .toReadResponse();
 
         // update customer
         final ResponseEntity<String> updateResult = updateCustomer(id, newAddress);
@@ -100,7 +97,7 @@ class CustomerIntegrationTest {
         final ReadCustomerResponse readResult = readCustomer(id).getBody();
 
         then(readResult)
-            .isEqualTo(sampleReadCustomerResponse(id, newAddress));
+            .isEqualTo(expected);
     }
 
     @Test
@@ -128,23 +125,13 @@ class CustomerIntegrationTest {
     }
 
     private UUID prepareSampleCustomer() {
-        return prepareSampleCustomer(Sample.address);
+        return prepareSampleCustomer(sample.address());
     }
 
     private UUID prepareSampleCustomer(String address) {
         final URI location = createSampleCustomer(address).getHeaders().getLocation();
         then(location).isNotNull();
-        final var id = UUID.fromString(substringAfterLast(location.toString(), "/"));
-        return id;
-    }
-
-    private static ReadCustomerResponse sampleReadCustomerResponse(UUID id) {
-        return sampleReadCustomerResponse(id, Sample.address);
-    }
-
-    private static ReadCustomerResponse sampleReadCustomerResponse(UUID id, String address) {
-        return new ReadCustomerResponse(id.toString(),
-            Sample.firstName, Sample.lastName, Sample.fiscalCode, address, List.of());
+        return UUID.fromString(substringAfterLast(location.toString(), "/"));
     }
 
     private ResponseEntity<String> deleteCustomer(UUID id) {
@@ -162,13 +149,11 @@ class CustomerIntegrationTest {
     }
 
     private ResponseEntity<String> createSampleCustomer() {
-        return createSampleCustomer(Sample.address);
+        return createSampleCustomer(sample.address());
     }
 
     private ResponseEntity<String> createSampleCustomer(String address) {
-        final var customer =
-            new CreateCustomerRequest(Sample.firstName, Sample.lastName, Sample.fiscalCode,
-                address);
+        final var customer = sample.withAddress(address).toCreateRequest();
         return rest.postForEntity(urlOf("/customers"), customer, String.class);
     }
 
