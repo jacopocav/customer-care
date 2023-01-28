@@ -21,7 +21,7 @@ Alternatively, build the project with `mvn verify` and then manually run the pro
 jar with:
 
 ```shell
-java -jar target/customer-care-1.0-SNAPSHOT.jar
+java -jar target/customer-care-1.0.jar
 ```
 
 The server will be accessible under `http://localhost:8080`.
