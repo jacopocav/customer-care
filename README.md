@@ -42,7 +42,7 @@ is [application.yaml](src/main/resources/application.yaml).
 ### Debugging
 
 When
-the `debug` [Spring profile](https://docs.spring.io/spring-boot/docs/3.0.2/reference/htmlsingle/#features.profiles)
+the `debug` [Spring profile](https://docs.spring.io/spring-boot/docs/3.0.2/reference/html/features.html#features.profiles)
 is enabled, more detailed information will be logged on the console.
 
 In addition, an H2 console will be exposed at [/h2-console](http://localhost:8080/h2-console).
