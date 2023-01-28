@@ -1,5 +1,8 @@
 package integration.rest.handler;
 
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.util.Arrays.stream;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -7,8 +10,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.util.ReflectionUtils.invokeMethod;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.lang.reflect.RecordComponent;
 import java.util.Map;
+import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +35,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import integration.rest.handler.ValidationExceptionHandlerTest.Config.AllNotNull;
 import integration.rest.handler.ValidationExceptionHandlerTest.Config.TestController;
 import io.jacopocav.customercare.dto.ErrorResponse;
 import io.jacopocav.customercare.rest.handler.ValidationExceptionHandler;
+import jakarta.validation.Constraint;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.Payload;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -87,13 +100,37 @@ class ValidationExceptionHandlerTest {
     }
 
     @Test
-    void handle_bindException() throws Exception {
+    void handle_bindException_withoutGlobalErrors() throws Exception {
         // given
-        final var body = new Body(null);
+        final var body = new Body("  ", true);
 
         final var expected = new ErrorResponse<>(
             "Validation failed",
             null, Map.of(
+            "field", "must not be blank"
+        ));
+
+        // when
+        final var result = mockMvc.perform(post("/test/validation")
+            .contentType(APPLICATION_JSON)
+            .content(mapper.writeValueAsString(body)));
+
+        // then
+        result
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(APPLICATION_JSON))
+            .andExpect(content().json(mapper.writeValueAsString(expected)));
+    }
+
+    @Test
+    void handle_bindException_withGlobalErrors() throws Exception {
+        // given
+        final var body = new Body("  ", null);
+
+        final var expected = new ErrorResponse<>(
+            "Validation failed",
+            null, Map.of(
+            "global-errors", "a field is null",
             "field", "must not be blank"
         ));
 
@@ -161,8 +198,12 @@ class ValidationExceptionHandlerTest {
             .andExpect(content().json(mapper.writeValueAsString(expected)));
     }
 
+    @AllNotNull
+    public record Body(@NotBlank String field, Boolean anotherField) {}
+
     @Configuration
     static class Config {
+
         @Bean
         ValidationExceptionHandler underTest() {
             return new ValidationExceptionHandler();
@@ -174,6 +215,7 @@ class ValidationExceptionHandlerTest {
         @SuppressWarnings("unused")
         @RequestMapping(path = "/test", produces = APPLICATION_JSON_VALUE)
         static class TestController {
+
             @GetMapping("/validation")
             int validation(
                 @RequestParam @NotBlank String param,
@@ -186,8 +228,33 @@ class ValidationExceptionHandlerTest {
             long bodyValidation(@RequestBody @Valid Body body) {
                 return 42;
             }
+
+        }
+
+        @Constraint(validatedBy = AllNotNullRecordValidator.class)
+        @Target(TYPE)
+        @Retention(RUNTIME)
+        @interface AllNotNull {
+
+            String message() default "a field is null";
+
+            Class<?>[] groups() default {};
+
+            Class<? extends Payload>[] payload() default {};
+
+        }
+
+        static class AllNotNullRecordValidator
+            implements ConstraintValidator<AllNotNull, Record> {
+            @Override
+            public boolean isValid(Record value, ConstraintValidatorContext context) {
+                final var components = value.getClass().getRecordComponents();
+
+                return stream(components)
+                    .map(RecordComponent::getAccessor)
+                    .map(acc -> invokeMethod(acc, value))
+                    .allMatch(Objects::nonNull);
+            }
         }
     }
-
-    record Body(@NotBlank String field) {}
 }

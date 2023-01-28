@@ -9,12 +9,14 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.mapping;
 import static java.util.stream.StreamSupport.stream;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -95,10 +97,11 @@ public class ValidationExceptionHandler {
 
         final String globalErrors = ex.getGlobalErrors().stream()
             .map(DefaultMessageSourceResolvable::getDefaultMessage)
+            .filter(StringUtils::isNotBlank)
             .collect(joining(", "));
 
         final Map<String, String> fieldErrors = ex.getFieldErrors().stream()
-            .filter(err -> err.getDefaultMessage() != null)
+            .filter(err -> isNotBlank(err.getDefaultMessage()))
             .collect(groupingBy(FieldError::getField,
                 mapping(DefaultMessageSourceResolvable::getDefaultMessage, joining(", "))));
 
