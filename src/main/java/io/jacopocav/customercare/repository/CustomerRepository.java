@@ -1,17 +1,16 @@
 package io.jacopocav.customercare.repository;
 
+import static org.springframework.data.jpa.repository.EntityGraph.EntityGraphType.LOAD;
+
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import io.jacopocav.customercare.model.Customer;
 
 public interface CustomerRepository extends JpaRepository<Customer, UUID> {
-    @Query("select c "
-        + "from Customer c "
-        + "left join fetch c.devices "
-        + "where c.id = :id")
-    Optional<Customer> findByIdFetchingDevices(UUID id);
+    @EntityGraph(attributePaths = Customer.Fields.devices, type = LOAD)
+    Optional<Customer> findFetchingDevicesById(UUID id);
 }

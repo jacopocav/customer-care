@@ -116,7 +116,7 @@ class DefaultCustomerCrudServiceTest {
             // given
             final var id = UUID.randomUUID();
 
-            given(repository.findByIdFetchingDevices(id))
+            given(repository.findFetchingDevicesById(id))
                 .willReturn(Optional.empty());
 
             // when
@@ -138,7 +138,7 @@ class DefaultCustomerCrudServiceTest {
                 .setId(id);
             final var expected = new ReadCustomerResponse(id.toString(), "", "", "", "", List.of());
 
-            given(repository.findByIdFetchingDevices(id))
+            given(repository.findFetchingDevicesById(id))
                 .willReturn(Optional.of(customer));
 
             given(mapper.toDto(customer))

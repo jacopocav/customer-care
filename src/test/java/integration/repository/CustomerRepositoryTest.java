@@ -26,7 +26,7 @@ class CustomerRepositoryTest {
     @Autowired TestEntityManager entityManager;
 
     @Test
-    void findByIdFetchingDevices_givenNoDeviceIsAssociatedToCustomer() {
+    void findFetchingDevicesById_givenNoDeviceIsAssociatedToCustomer() {
         // given
         final var customer = new Customer()
             .setFirstName("Mary")
@@ -45,7 +45,7 @@ class CustomerRepositoryTest {
         entityManager.flush();
 
         // when
-        final var actual = underTest.findByIdFetchingDevices(id);
+        final var actual = underTest.findFetchingDevicesById(id);
 
         // then
         then(actual)
@@ -56,7 +56,7 @@ class CustomerRepositoryTest {
     }
 
     @Test
-    void findByIdFetchingDevices_givenSomeDeviceIsAssociatedToCustomer() {
+    void findFetchingDevicesById_givenSomeDeviceIsAssociatedToCustomer() {
         // given
 
         final var customer = new Customer()
@@ -83,7 +83,7 @@ class CustomerRepositoryTest {
         entityManager.clear();
 
         // when
-        final var actual = underTest.findByIdFetchingDevices(customerId);
+        final var actual = underTest.findFetchingDevicesById(customerId);
 
         // then
         then(actual)

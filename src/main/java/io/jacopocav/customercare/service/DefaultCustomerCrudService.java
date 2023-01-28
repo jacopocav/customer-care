@@ -38,7 +38,7 @@ public class DefaultCustomerCrudService implements CustomerCrudService {
         requireNotBlank(id, "id");
 
         final var uuid = UUID.fromString(id);
-        final var customer = repository.findByIdFetchingDevices(uuid)
+        final var customer = repository.findFetchingDevicesById(uuid)
             .orElseThrow(() -> new CustomerNotFoundException(uuid));
 
         return mapper.toDto(customer);
